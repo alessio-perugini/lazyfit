@@ -12,6 +12,7 @@ import (
 const (
 	LAYOUTZONE = "2006-01-02T15:04:05"
 )
+
 type TimeTable []TimeElement
 
 func UnmarshalTimeTable(data []byte) (TimeTable, error) {
@@ -53,9 +54,10 @@ func getTimeTableRequest(corso, startTime, endTime string) {
 	}
 }
 
-func getTodayLastAvailableCourse() string{
+func getTodayLastAvailableCourse() string {
 	var lastCourse time.Time
 	var orarioDaPrenotare TimeElement
+
 	for i := range listaOrari {
 		t, err := time.Parse(LAYOUTZONE, listaOrari[i].StartDateTime)
 		if err != nil {
@@ -65,13 +67,13 @@ func getTodayLastAvailableCourse() string{
 		if currentDay.Day() == t.Day() {
 			lastCourse = t
 			orarioDaPrenotare = listaOrari[i]
-		}else {
+		} else {
 			break
 		}
 	}
 
 	if lastCourse.IsZero() {
-		log.Fatal("Corso pieno!")
+		return ""
 	}
 
 	return orarioDaPrenotare.ID

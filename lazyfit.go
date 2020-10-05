@@ -1,4 +1,5 @@
 package lazyfit
+
 //TODO modularizzare
 //TODO telegram
 //TODO mini cache
@@ -23,7 +24,7 @@ func (r *Status) Marshal() ([]byte, error) {
 }
 
 type Status struct {
-	Status  string `json:"status"`
+	Status  string  `json:"status"`
 	Message *string `json:"message,omitempty"`
 }
 
@@ -38,14 +39,15 @@ const (
 type Action uint8
 
 type Config struct {
-	Account Account `yaml:"account"`
-	API     API     `yaml:"api"`
+	Account  Account  `yaml:"account"`
+	API      API      `yaml:"api"`
+	Telegram Telegram `yaml:"telegram"`
 }
 
 var (
 	start         = "2020-10-05"
 	end           = "2020-10-12"
-	currentDay    = time.Now()//.AddDate(0,0,-6) //TODO DEBUGONLY
+	currentDay    = time.Now() //.AddDate(0,0,-6) //TODO DEBUGONLY
 	listaOrari    TimeTable
 	prenotazione  Status
 	listCourses   = make([]Course, 0, 35)
@@ -55,11 +57,14 @@ var (
 	Conf          *Config
 	user          *Account
 	api           *API
+	teleBot       *Telegram
 )
 
 func Start() {
 	user = NewAccount()
 	api = NewApi()
+	teleBot = NewTelegramBot()
+	teleBot.Start()
 
 	fmt.Println(currentDay.Format("Mon, 02/01/2006 15:04:05"))
 
@@ -100,19 +105,21 @@ func Start() {
 
 	PreBookingInit()
 	AutoBooking()
+	teleBot.Stop()
 }
 
-func PreBookingInit(){
+func PreBookingInit() {
 	user.Login()
 	getCoursesRequest()
 }
 
 func AutoBooking() {
 	giorno := currentDay.Weekday()
-	start, end = getDailyFilterParam()//getWeeklyFilterParam()
+	start, end = getDailyFilterParam() //getWeeklyFilterParam()
 	//giorno = time.Wednesday //TODO DEBUG ONLY
 	switch giorno {
-	case time.Monday: fallthrough
+	case time.Monday:
+		fallthrough
 	case time.Wednesday:
 		//Book("SALA PESI 17:00")//TODO DEBUG ONLY
 		Book("CALISTHENICS")
