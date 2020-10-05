@@ -6,7 +6,6 @@ import (
 	"github.com/gocolly/colly"
 	"log"
 	"strings"
-	"time"
 )
 
 const (
@@ -55,28 +54,16 @@ func getTimeTableRequest(corso, startTime, endTime string) {
 }
 
 func getTodayLastAvailableCourse() string {
-	var lastCourse time.Time
-	var orarioDaPrenotare TimeElement
-
-	for i := range listaOrari {
-		t, err := time.Parse(LAYOUTZONE, listaOrari[i].StartDateTime)
-		if err != nil {
-			log.Println(err)
-		}
-
-		if currentDay.Day() == t.Day() {
-			lastCourse = t
-			orarioDaPrenotare = listaOrari[i]
-		} else {
-			break
-		}
-	}
-
-	if lastCourse.IsZero() {
+	if nFasce := len(listaOrari); nFasce > 0 { /*
+			t, err := time.Parse(LAYOUTZONE, listaOrari[nFasce-1].StartDateTime)
+			if err != nil {
+				log.Println(err)
+			}
+			fmt.Println(t)*/
+		return listaOrari[nFasce-1].ID
+	} else {
 		return ""
 	}
-
-	return orarioDaPrenotare.ID
 }
 
 func PrintInfoOrari() {

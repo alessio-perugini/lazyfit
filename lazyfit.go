@@ -122,7 +122,7 @@ func AutoBooking() {
 		fallthrough
 	case time.Wednesday:
 		//Book("SALA PESI 17:00")//TODO DEBUG ONLY
-		Book("CALISTHENICS")
+		//Book("CALISTHENICS")
 		Book("SALA PESI 18:15")
 		Book("SALA PESI 19:30")
 	case time.Friday:
