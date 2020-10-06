@@ -32,15 +32,14 @@ func unBookRequest(req map[string]string) {
 func Book(nomeCorso string) {
 	idCourse := findCourseIdFromName(nomeCorso)
 	getTimeTableRequest(idCourse, start, end)
-	//currentDay 		= currentDay.AddDate(0,0,7) //TODO DEBUG ONLY
 	idBooking := getTodayLastAvailableCourse()
 	if idBooking == "" {
 		teleBot.SendTelegramMessage(nomeCorso + ": corso pieno")
 		return
 	}
+
 	bookRequest(idCourse, idBooking)
 	teleBot.SendTelegramMessage(nomeCorso + ": " + *prenotazione.Message)
-	//UnBook(idBooking) //TODO DEBUG ONLY
 }
 
 //TODO migliorare questo xke dovrei fare un fetch dei prenotati e poi da li scegliere quale

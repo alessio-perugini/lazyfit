@@ -2,6 +2,9 @@ package lazyfit
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"reflect"
 	"strings"
 )
@@ -20,18 +23,12 @@ func findCourseIdFromName(name string) string {
 	return ""
 }
 
-func getDailyFilterParam() (string,string) {
-	giorno := currentDay.Weekday()
+func getDailyFilterParam() (string, string) {
+	nextWeekDay := currentDay.AddDate(0, 0, 7)
 
-	if giorno == 0 { // used because weekday starts with sunday
-		giorno = 7
-	}
+	day := fmt.Sprintf("%d-%d-%d", nextWeekDay.Year(), nextWeekDay.Month(), nextWeekDay.Day())
 
-	nextMonday := currentDay.AddDate(0,0, 7 - int(giorno) + 1)
-
-	inizio := fmt.Sprintf("%d-%d-%d", nextMonday.Year(), nextMonday.Month(), nextMonday.Day())
-
-	return inizio, inizio
+	return day, day
 }
 
 func getWeeklyFilterParam() (string, string) {
@@ -41,7 +38,7 @@ func getWeeklyFilterParam() (string, string) {
 		giorno = 7
 	}
 
-	nextMonday := currentDay.AddDate(0,0, 7 - int(giorno) + 1)
+	nextMonday := currentDay.AddDate(0, 0, 7-int(giorno)+1)
 	nextSunday := nextMonday.AddDate(0, 0, 6)
 
 	inizio := fmt.Sprintf("%d-%d-%d", nextMonday.Year(), nextMonday.Month(), nextMonday.Day())
@@ -65,7 +62,7 @@ func ConvertStructToMapOfStrings(st interface{}) map[string]string {
 		value := v.FieldByName(t.Field(i).Name)
 
 		// if jsonName is not empty use it for the key
-		if jsonName != ""  && jsonName != "-" {
+		if jsonName != "" && jsonName != "-" {
 			key = jsonName
 		}
 
@@ -81,9 +78,32 @@ func ConvertStructToMapOfStrings(st interface{}) map[string]string {
 				reqRules[key] = "false"
 			}
 		default:
-			reqRules[key] = ""//value.Interface()
+			reqRules[key] = "" //value.Interface()
 		}
 	}
 
 	return reqRules
+}
+
+func SendHttpRequest(method, url string) []byte {
+	var resp *http.Response
+	var err error
+
+	if method == "POST" {
+		resp, err = http.Post(url, "", nil)
+	} else {
+		resp, err = http.Get(url)
+	}
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return body
 }

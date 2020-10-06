@@ -47,7 +47,7 @@ type Config struct {
 var (
 	start         = "2020-10-05"
 	end           = "2020-10-12"
-	currentDay    = time.Now() //.AddDate(0,0,-6) //TODO DEBUGONLY
+	currentDay    = time.Now()
 	listaOrari    TimeTable
 	prenotazione  Status
 	listCourses   = make([]Course, 0, 35)
@@ -116,13 +116,12 @@ func PreBookingInit() {
 func AutoBooking() {
 	giorno := currentDay.Weekday()
 	start, end = getDailyFilterParam() //getWeeklyFilterParam()
-	//giorno = time.Wednesday //TODO DEBUG ONLY
+
 	switch giorno {
 	case time.Monday:
 		fallthrough
 	case time.Wednesday:
-		//Book("SALA PESI 17:00")//TODO DEBUG ONLY
-		//Book("CALISTHENICS")
+		Book("CALISTHENICS")
 		Book("SALA PESI 18:15")
 		Book("SALA PESI 19:30")
 	case time.Friday:
